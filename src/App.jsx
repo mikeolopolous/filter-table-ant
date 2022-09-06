@@ -1,7 +1,44 @@
-import { Table } from 'antd';
+import { useState, useRef } from 'react';
+import { Table, Input, Button } from 'antd';
 import './App.css';
 
 const App = () => {
+
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm()
+    setSearchText(selectedKeys[0])
+    setSearchedColumn(dataIndex)
+  };
+
+  const getColumnSearchProps = dataIndex => { // dataIndex = 'nombre'
+    return {
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilter }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            ref ={searchInput}
+            placeholder={`Buscar ${dataIndex}`}
+            value={selectedKeys[0]}
+            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [] )}
+            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon="search"
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            Buscar
+          </Button>
+        </div>
+      )
+    };
+  };
 
   const columns = [
     {
@@ -9,6 +46,7 @@ const App = () => {
       dataIndex: 'nombre',
       key: 'nombre',
       width: '30%',
+      ...getColumnSearchProps('nombre')
     },
     {
       title: 'Apellido',
@@ -22,7 +60,7 @@ const App = () => {
       key: 'edad',
       width: '30%',
     }
-  ]
+  ];
 
   const data = [
     {
@@ -49,7 +87,7 @@ const App = () => {
       apellido: 'Vega',
       edad: 53
     }
-  ]
+  ];
 
   return (
     <>
@@ -57,9 +95,10 @@ const App = () => {
       <Table
         columns={columns}
         dataSource={data}
+        pagination={false}
       />
     </>
   )
-}
+};
 
-export default App
+export default App;
